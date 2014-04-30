@@ -15,6 +15,9 @@
       function setEnabled(element, enabled) {
         element.attr("disabled", !enabled)
       }
+      function toResultStream(request) {
+        return Bacon.fromPromise($.ajax(request));
+      }
       $(function() {
           $(".ajax").hide()
           usernameField = $("#username input")
@@ -31,10 +34,21 @@
           // Streams / Properties
           usernameEntered = username.map(nonEmpty)
           fullnameEntered = fullname.map(nonEmpty)
-          buttonEnabled = usernameEntered.and(fullnameEntered)
+          availabilityRequest = username.changes()
+            .map(function(user) { return { url: '/usernameavailable/' + user }});
+          availabilityResponse = availabilityRequest.ajax();
+          usernameAvailable = availabilityResponse.toProperty(true);
+          checkPending = availabilityRequest.awaiting(availabilityResponse);
+
+          buttonEnabled = usernameEntered
+            .and(fullnameEntered)
+            .and(usernameAvailable)
+            .and(checkPending.not());
 
           // Side-effects
           buttonEnabled.assign(setEnabled, registerButton)
+          usernameAvailable.not().onValue(setVisibility, unavailabilityLabel);
+
       })
     </script>
   </head>
