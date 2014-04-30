@@ -22,6 +22,25 @@
           unavailabilityLabel = $("#username-unavailable")
           usernameAjaxIndicator = $("#username .ajax")
           registerAjaxIndicator = $("#register .ajax")
+      
+      username = Bacon.UI.textFieldValue($("#username input"));
+      fullname = Bacon.UI.textFieldValue($("#fullname input"));
+      
+      function nonEmpty(x) { return x.length > 0; }
+      usernameEntered = username.map(nonEmpty);
+      fullnameEntered = fullname.map(nonEmpty);
+      buttonEnabled = usernameEntered.and(fullnameEntered);
+      // buttonEnabled.onValue(function(enabled) {
+      //  $('#register button').attr('disabled', !enabled);
+      // });
+      // OR
+      // buttonEnabled.not().onValue($('#register button'), 'attr', 'disabled');
+      // OR
+      // buttonEnabled.not().onValue(registerButton, 'attr', 'disabled');
+      // OR
+      buttonEnabled.assign(setEnabled, registerButton);
+      
+      
       })
     </script>
   </head>
